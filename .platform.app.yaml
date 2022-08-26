@@ -19,6 +19,13 @@ dependencies:
 relationships:
     database: "db:mysql"
 
+variables:
+    php:
+        session.gc_maxlifetime: '200000'
+        session.cookie_lifetime: '2000000'
+        pcre.backtrack_limit: '200000'
+        pcre.recursion_limit: '200000'
+
 # The configuration of app when it is exposed to the web.
 web:
     locations:
