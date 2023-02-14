@@ -87,7 +87,7 @@ source:
                 # get our pub directory as defined in the application
                 pubDir=$(echo $PLATFORM_APPLICATION | base64 --decode | jq -r '.web.locations."/".root')
                 # grab the latest version of WordPress, save locally based on pubDir name
-                curl https://wordpress.org/latest -p "${PLATFORM_CACHE_DIR}/${pubDir}.tar.gz"
+                curl https://wordpress.org/latest -o "${PLATFORM_CACHE_DIR}/${pubDir}.tar.gz"
                 cd "${PLATFORM_CACHE_DIR}"
                 tar -xvf "${pubDir}.tar.gz" && rm "${pubDir}.tar.gz"
                 # the archive always expands into a "wordpress" directory
