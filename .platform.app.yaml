@@ -74,3 +74,26 @@ mounts:
         source: local
         source_path: "uploads"
 
+hooks:
+    deploy: |
+        wp cache flush
+        wp core update-db
+        wp cron event run --due-now
+
+source:
+    operations:
+        auto-update:
+            command: |
+                # get our pub directory as defined in the application
+                pubDir=$(echo $PLATFORM_APPLICATION | base64 --decode | jq -r '.web.locations."/".root')
+                # grab the latest version of WordPress, save locally based on pubDir name
+                curl https://wordpress.org/latest -p "${PLATFORM_CACHE_DIR}/${pubDir}.tar.gz"
+                cd "${PLATFORM_CACHE_DIR}"
+                tar -xvf "${pubDir}.tar.gz" && rm "${pubDir}.tar.gz"
+                # the archive always expands into a "wordpress" directory
+                rsync -av wordpress/ "${PLATFORM_SOURCE_DIR}/${pubDir}"
+                cd "${PLATFORM_SOURCE_DIR}"
+                git add --all
+                git commit -m "Auto updated via source operations"
+                
+                
