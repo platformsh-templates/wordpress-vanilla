@@ -74,6 +74,12 @@ mounts:
         source: local
         source_path: "uploads"
 
+hooks:
+    deploy: |
+        wp cache flush
+        wp core update-db
+        wp cron event run --due-now
+
 source:
     operations:
         auto-update:
