@@ -1,0 +1,57 @@
+name: Trigger Source Operations on a Schedule
+on:
+  schedule:
+    # Run at 00:15 every day
+    - cron: '15 0 * * *'
+  workflow_dispatch:
+
+env:
+  PLATFORMSH_CLI_TOKEN: ${{ secrets.TEMPLATES_CLI_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.TEMPLATES_GITHUB_TOKEN }}
+  UPDATE_BRANCH: "update"
+
+jobs:
+  run_update:
+    name: Trigger Source Op
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'platformsh-templates' }}
+    steps:
+      - name: 'Install Psh CLI tool'
+        id: install-psh-cli
+        run: |
+          curl -fsS https://platform.sh/cli/installer | php
+          echo "PATH=${HOME}/.platformsh/bin:${PATH}" >> $GITHUB_ENV
+
+      - name: 'Get project ID'
+        id: 'get-projid'
+        uses: platformsh/gha-retrieve-projectid@main
+        with:
+          github_token: ${GITHUB_TOKEN}
+
+      - name: 'Set Project ID'
+        is: 'set-projid'
+        run: |
+          echo "PLATFORM_PROJECT=${{ steps.get-projid.output.project_id }}" >> $GITHUB_ENV
+
+      - name: "Check for update branch"
+        id: "check-update-branch"
+        run: |
+          # For now the update branch name is hard-coded above as an env var
+          # Switch to updater branch if it exists else create a local copy from default
+          echo "::notice::Switching to branch ${UPDATE_BRANCH}"
+          git checkout ${UPDATE_BRANCH} 2>/dev/null || git checkout -b ${UPDATE_BRANCH} origin/${{ github.event.repository.default_branch }} 
+          
+          #now push it back up in case we just created it so we can sync it to platform.sh
+          git push -u origin ${UPDATE_BRANCH}
+
+      - name: "Make sure it is sync'ed"
+        id: 'sync-update-branch'
+        run: |
+          git pull origin main
+          git push -u origin ${UPDATE_BRANCH}
+
+
+      - name: 'Run source ops'
+        id: run-source-op
+        run: |
+          platform source-operation:run auto-updater -e ${UPDATE_BRANCH}
