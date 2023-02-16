@@ -29,7 +29,7 @@ jobs:
           github_token: ${GITHUB_TOKEN}
 
       - name: 'Set Project ID'
-        is: 'set-projid'
+        id: 'set-projid'
         run: |
           echo "PLATFORM_PROJECT=${{ steps.get-projid.output.project_id }}" >> $GITHUB_ENV
 
