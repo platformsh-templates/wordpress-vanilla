@@ -95,5 +95,3 @@ source:
                 cd "${PLATFORM_SOURCE_DIR}"
                 git add --all
                 git commit -m "Auto updated via source operations"
-                
-                
