@@ -31,7 +31,8 @@ jobs:
       - name: 'Set Project ID'
         id: 'set-projid'
         run: |
-          echo "PLATFORM_PROJECT=${{ steps.get-projid.output.project_id }}" >> $GITHUB_ENV
+          echo "::notice::Found Project ID of ${{ steps.get-projid.outputs.project_id }}"
+          echo "PLATFORM_PROJECT=${{ steps.get-projid.outputs.project_id }}" >> $GITHUB_ENV
 
       - name: 'check out repo'
         id: check-out-repo
