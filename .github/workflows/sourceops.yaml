@@ -44,16 +44,19 @@ jobs:
           # Switch to updater branch if it exists else create a local copy from default
           echo "::notice::Switching to branch ${UPDATE_BRANCH}"
           git checkout ${UPDATE_BRANCH} 2>/dev/null || git checkout -b ${UPDATE_BRANCH} origin/${{ github.event.repository.default_branch }} 
-          
-          #now push it back up in case we just created it so we can sync it to platform.sh
-          git push -u origin ${UPDATE_BRANCH}
 
       - name: "Make sure it is sync'ed"
         id: 'sync-update-branch'
         run: |
+          git fetch
+          git pull origin ${UPDATE_BRANCH} || true
           git pull origin ${{ github.event.repository.default_branch }}
-          git push -u origin ${UPDATE_BRANCH}
 
+      - name: 'Push back so we can get it pushed to psh'
+        id: push-update-branch
+        run: |
+          #now push it back up in case we just created it so we can sync it to platform.sh
+          git push -u origin ${UPDATE_BRANCH}
 
       - name: 'Run source ops'
         id: run-source-op
