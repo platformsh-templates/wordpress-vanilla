@@ -49,13 +49,15 @@ jobs:
         id: 'sync-update-branch'
         run: |
           git fetch
-          git pull origin ${UPDATE_BRANCH} || true
+          git pull origin ${UPDATE_BRANCH} 2>/dev/null || echo "::notice::Branch ${UPDATE_BRANCH} doesnt exist on origin yet"  
+          echo "::notice::Pulling changes from ${{ github.event.repository.default_branch}} into ${UPDATE_BRANCH}."
           git pull origin ${{ github.event.repository.default_branch }}
 
       - name: 'Push back so we can get it pushed to psh'
         id: push-update-branch
         run: |
           #now push it back up in case we just created it so we can sync it to platform.sh
+          echo "::notice::Pushing ${UPDATE_BRANCH} to origin."
           git push -u origin ${UPDATE_BRANCH}
 
       - name: 'Run source ops'
