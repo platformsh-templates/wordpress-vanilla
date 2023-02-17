@@ -66,4 +66,6 @@ jobs:
       - name: 'Run source ops'
         id: run-source-op
         run: |
-          platform source-operation:run auto-updater -e ${UPDATE_BRANCH}
+          # @todo we need to check to see if this fails for some reason that doesnt cause the CLI to return a non-0 exit
+          # code. E.G. no source-op defined by this name
+          platform source-operation:run auto-update -e ${UPDATE_BRANCH}
