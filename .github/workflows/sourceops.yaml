@@ -36,6 +36,8 @@ jobs:
       - name: 'check out repo'
         id: check-out-repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: "Check for update branch"
         id: "check-update-branch"
