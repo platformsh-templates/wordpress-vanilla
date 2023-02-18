@@ -94,4 +94,12 @@ source:
                 rsync -av wordpress/ "${PLATFORM_SOURCE_DIR}/${pubDir}"
                 cd "${PLATFORM_SOURCE_DIR}"
                 git add --all
-                git commit -m "Auto updated via source operations"
+                confirm=$(git status --porcelain=1);
+                if [ -z "${confirm}" ]; then
+                    echo "No changes to commit."
+                else
+                    git commit -m "Auto updated via source operations" 
+                fi
+                
+                
+

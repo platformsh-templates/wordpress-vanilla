@@ -31,11 +31,14 @@ jobs:
       - name: 'Set Project ID'
         id: 'set-projid'
         run: |
-          echo "PLATFORM_PROJECT=${{ steps.get-projid.output.project_id }}" >> $GITHUB_ENV
+          echo "::notice::Found Project ID of ${{ steps.get-projid.outputs.project_id }}"
+          echo "PLATFORM_PROJECT=${{ steps.get-projid.outputs.project_id }}" >> $GITHUB_ENV
 
       - name: 'check out repo'
         id: check-out-repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: "Check for update branch"
         id: "check-update-branch"
@@ -44,18 +47,25 @@ jobs:
           # Switch to updater branch if it exists else create a local copy from default
           echo "::notice::Switching to branch ${UPDATE_BRANCH}"
           git checkout ${UPDATE_BRANCH} 2>/dev/null || git checkout -b ${UPDATE_BRANCH} origin/${{ github.event.repository.default_branch }} 
-          
-          #now push it back up in case we just created it so we can sync it to platform.sh
-          git push -u origin ${UPDATE_BRANCH}
 
       - name: "Make sure it is sync'ed"
         id: 'sync-update-branch'
         run: |
+          git fetch
+          git pull origin ${UPDATE_BRANCH} 2>/dev/null || echo "::notice::Branch ${UPDATE_BRANCH} doesnt exist on origin yet"  
+          echo "::notice::Pulling changes from ${{ github.event.repository.default_branch}} into ${UPDATE_BRANCH}."
           git pull origin ${{ github.event.repository.default_branch }}
-          git push -u origin ${UPDATE_BRANCH}
 
+      - name: 'Push back so we can get it pushed to psh'
+        id: push-update-branch
+        run: |
+          #now push it back up in case we just created it so we can sync it to platform.sh
+          echo "::notice::Pushing ${UPDATE_BRANCH} to origin."
+          git push -u origin ${UPDATE_BRANCH}
 
       - name: 'Run source ops'
         id: run-source-op
         run: |
-          platform source-operation:run auto-updater -e ${UPDATE_BRANCH}
+          # @todo we need to check to see if this fails for some reason that doesnt cause the CLI to return a non-0 exit
+          # code. E.G. no source-op defined by this name
+          platform source-operation:run auto-update -e ${UPDATE_BRANCH}
