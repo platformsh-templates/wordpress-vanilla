@@ -3,13 +3,13 @@
  * @package Akismet
  */
 /*
-Plugin Name: Akismet Anti-Spam
+Plugin Name: Akismet Anti-Spam: Spam Protection
 Plugin URI: https://akismet.com/
-Description: Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. It keeps your site protected even while you sleep. To get started: activate the Akismet plugin and then go to your Akismet Settings page to set up your API key.
+Description: Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. Akismet anti spam keeps your site protected even while you sleep. To get started: activate the Akismet plugin and then go to your Akismet Settings page to set up your API key.
 Version: 5.1
 Requires at least: 5.0
 Requires PHP: 5.2
-Author: Automattic
+Author: Automattic - Anti Spam Team
 Author URI: https://automattic.com/wordpress-plugins/
 License: GPLv2 or later
 Text Domain: akismet
