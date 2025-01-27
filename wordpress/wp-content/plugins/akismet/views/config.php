@@ -20,29 +20,30 @@ $kses_allow_link_href = array(
 		<?php } ?>
 		<?php if ( ! empty( $notices ) ) { ?>
 			<?php foreach ( $notices as $notice ) { ?>
-				<?php Akismet::view( 'notice', $notice ); ?>
+				<?php Akismet::view( 'notice', array_merge( $notice, array( 'parent_view' => $name ) ) ); ?>
 			<?php } ?>
 		<?php } ?>
 
-		<div class="akismet-card">
-			<div class="akismet-section-header">
-				<h2 class="akismet-section-header__label">
-					<span><?php esc_html_e( 'Statistics', 'akismet' ); ?></span>
-				</h2>
+		<?php if ( isset( $stat_totals['all'] ) && isset( $stat_totals['6-months'] ) ) : ?>
+			<div class="akismet-card">
+				<div class="akismet-section-header">
+					<h2 class="akismet-section-header__label">
+						<span><?php esc_html_e( 'Statistics', 'akismet' ); ?></span>
+					</h2>
 
-			<?php if ( $stat_totals && isset( $stat_totals['all'] ) && (int) $stat_totals['all']->spam > 0 ) : ?>
-				<div class="akismet-section-header__actions">
-					<a href="<?php echo esc_url( Akismet_Admin::get_page_url( 'stats' ) ); ?>">
-						<?php esc_html_e( 'Detailed stats', 'akismet' ); ?>
-					</a>
-				</div>
-			</div> <!-- close akismet-section-header -->
+					<div class="akismet-section-header__actions">
+						<a href="<?php echo esc_url( Akismet_Admin::get_page_url( 'stats' ) ); ?>">
+							<?php esc_html_e( 'Detailed stats', 'akismet' ); ?>
+						</a>
+					</div>
+				</div> <!-- close akismet-section-header -->
 
 				<div class="akismet-new-snapshot">
 					<?php /* name attribute on iframe is used as a cache-buster here to force Firefox to load the new style charts: https://bugzilla.mozilla.org/show_bug.cgi?id=356558 */ ?>
 					<div class="akismet-new-snapshot__chart">
 						<iframe id="stats-iframe" allowtransparency="true" scrolling="no" frameborder="0" style="width: 100%; height: 220px; overflow: hidden;" src="<?php echo esc_url( sprintf( 'https://tools.akismet.com/1.0/snapshot.php?blog=%s&token=%s&height=200&locale=%s&is_redecorated=1', rawurlencode( get_option( 'home' ) ), rawurlencode( Akismet::get_access_token() ), get_locale() ) ); ?>" name="<?php echo esc_attr( 'snapshot-' . filemtime( __FILE__ ) ); ?>" title="<?php echo esc_attr__( 'Akismet stats' ); ?>"></iframe>
 					</div>
+
 					<ul class="akismet-new-snapshot__list">
 						<li class="akismet-new-snapshot__item">
 							<h3 class="akismet-new-snapshot__header"><?php esc_html_e( 'Past six months', 'akismet' ); ?></h3>
@@ -68,15 +69,8 @@ $kses_allow_link_href = array(
 						</li>
 					</ul>
 				</div> <!-- close akismet-new-snapshot -->
-
-			<?php else : ?>
-			</div> <!-- close akismet-section-header -->
-			<div class="inside">
-				<p class="akismet-awaiting-stats"><?php esc_html_e( 'Akismet is active and ready to stop spam. Your site&#8217;s spam statistics will be displayed here.', 'akismet' ); ?></p>
-			</div>
-			<?php endif; ?>
-
-		</div> <!-- close akismet-card -->
+			</div> <!-- close akismet-card -->
+		<?php endif; ?>
 
 		<?php if ( $akismet_user ) : ?>
 			<div class="akismet-card">
