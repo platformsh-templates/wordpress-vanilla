@@ -85,5 +85,19 @@ if ( ! defined( 'ABSPATH' ) ) {
   define( 'ABSPATH', dirname( __FILE__ ) . '/' );
 }
 
+/**
+ * Override debug settings if environment variables are set.
+ * Safe in prod, but lets you enable logs in staging/dev.
+ */
+if (filter_var(getenv('WP_DEBUG'), FILTER_VALIDATE_BOOLEAN)) {
+    define('WP_DEBUG', true);
+
+    $debug_display = getenv('WP_DEBUG_DISPLAY');
+    define('WP_DEBUG_DISPLAY', $debug_display !== false ? filter_var($debug_display, FILTER_VALIDATE_BOOLEAN) : false);
+
+    $debug_log = getenv('WP_DEBUG_LOG') ?: dirname(__FILE__) . '/wp-content/debug.log';
+    define('WP_DEBUG_LOG', $debug_log);
+}
+
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
