@@ -28,12 +28,6 @@ if (getenv('PLATFORM_RELATIONSHIPS')) {
 		define( 'DB_CHARSET', 'utf8' );
 		define( 'DB_COLLATE', '' );
 
-		// Debug mode should be disabled on Platform.sh. Set this constant to true
-		// in a wp-config-local.php file to skip this setting on local development.
-		if (!defined( 'WP_DEBUG' )) {
-			define( 'WP_DEBUG', false );
-		}
-
 		// Set all of the necessary keys to unique values, based on the Platform.sh
 		// entropy value.
 		if (getenv('PLATFORM_PROJECT_ENTROPY')) {
@@ -83,6 +77,26 @@ $table_prefix  = 'wp_';
 /** Absolute path to the WordPress directory. */
 if ( ! defined( 'ABSPATH' ) ) {
   define( 'ABSPATH', dirname( __FILE__ ) . '/' );
+}
+
+/**
+ * Override debug settings if environment variables are set.
+ * Safe in prod, but lets you enable logs in staging/dev.
+ */
+if (filter_var(getenv('WP_DEBUG'), FILTER_VALIDATE_BOOLEAN)) {
+    if (!defined('WP_DEBUG') || WP_DEBUG === false) {
+        define('WP_DEBUG', true);
+    }
+
+    $debug_display = getenv('WP_DEBUG_DISPLAY');
+    if (!defined('WP_DEBUG_DISPLAY')) {
+        define('WP_DEBUG_DISPLAY', $debug_display !== false ? filter_var($debug_display, FILTER_VALIDATE_BOOLEAN) : false);
+    }
+
+    $debug_log = getenv('WP_DEBUG_LOG') ?: dirname(__FILE__) . '/wp-content/debug.log';
+    if (!defined('WP_DEBUG_LOG')) {
+        define('WP_DEBUG_LOG', $debug_log);
+    }
 }
 
 /** Sets up WordPress vars and included files. */
